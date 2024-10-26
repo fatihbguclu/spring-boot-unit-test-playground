@@ -1,12 +1,10 @@
 package org.ft;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayNameGeneration(DisplayNameGenerator.Simple.class)
 public class DemoUtilsTestLifeCycles {
 
     DemoUtils demoUtils;
@@ -33,12 +31,14 @@ public class DemoUtilsTestLifeCycles {
     }
 
     @Test
+    //@DisplayName("Equals and Not Equals")
     void testEqualsAndNotEquals() {
         DemoUtils demoUtils = new DemoUtils();
         assertEquals(10, demoUtils.add(5, 5), "5+5 must be equals 10");
     }
 
     @Test
+    //@DisplayName("Null and Not Null")
     void testNullAndNotNull() {
         DemoUtils demoUtils = new DemoUtils();
         Integer number = null;
