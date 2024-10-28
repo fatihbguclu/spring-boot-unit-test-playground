@@ -8,7 +8,7 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class demoUtilsTestThrowAndTimeOuts {
+public class DemoUtilsTestThrowAndTimeOuts {
 
     DemoUtils demoUtils;
 
