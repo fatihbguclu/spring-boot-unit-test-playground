@@ -52,7 +52,7 @@ class FizzBuzzTest {
     @ParameterizedTest(name = "value={0} expected={1}")
     @DisplayName("Testing FizzBuzz with medium test data")
     @CsvFileSource(resources = "/medium-test-data.csv")
-    @Order(5)
+    @Order(6)
     void testFizzBuzzWithMediumCsv(int value, String expected) {
         assertEquals(expected, FizzBuzz.computeFizzBuzz(value));
     }
@@ -60,7 +60,7 @@ class FizzBuzzTest {
     @ParameterizedTest(name = "value={0} expected={1}")
     @DisplayName("Testing FizzBuzz with large test data")
     @CsvFileSource(resources = "/large-test-data.csv")
-    @Order(5)
+    @Order(7)
     void testFizzBuzzWithLargeCsv(int value, String expected) {
         assertEquals(expected, FizzBuzz.computeFizzBuzz(value));
     }
