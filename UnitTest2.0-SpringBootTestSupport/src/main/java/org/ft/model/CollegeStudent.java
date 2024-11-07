@@ -1,5 +1,7 @@
 package org.ft.model;
 public class CollegeStudent implements Student {
+
+    private Integer id;
     private String firstname;
     private String lastname;
     private String emailAddress;
@@ -12,6 +14,14 @@ public class CollegeStudent implements Student {
         this.firstname = firstname;
         this.lastname = lastname;
         this.emailAddress = emailAddress;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getFirstname() {
@@ -48,7 +58,7 @@ public class CollegeStudent implements Student {
 
     @Override
     public String toString() {
-        return "CollegeStudent{" +
+        return "CollegeStudent{" + "id=" + id +
                 "firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
@@ -64,5 +74,9 @@ public class CollegeStudent implements Student {
     @Override
     public String getFullName() {
         return getFirstname() + " " + getLastname();
+    }
+
+    private String getFirstNameAndId() {
+        return getFirstname() + " " + getId();
     }
 }
