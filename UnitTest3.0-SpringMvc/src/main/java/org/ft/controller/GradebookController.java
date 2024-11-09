@@ -1,5 +1,6 @@
 package org.ft.controller;
 
+import org.ft.model.Gradebook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
