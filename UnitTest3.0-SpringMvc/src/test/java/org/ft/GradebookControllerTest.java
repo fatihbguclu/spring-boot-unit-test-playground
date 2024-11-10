@@ -89,6 +89,13 @@ public class GradebookControllerTest {
 
     @Test
     public void createStudentHttpRequest() throws Exception {
+        CollegeStudent studentOne = new CollegeStudent("Eric",
+                "Roby", "eric_roby@luv2code_school.com");
+        List<CollegeStudent> collegeStudentList = new ArrayList<>(Arrays.asList(studentOne));
+        when(studentCreateServiceMock.getGradeBook()).thenReturn(collegeStudentList);
+
+        assertIterableEquals(collegeStudentList, studentCreateServiceMock.getGradeBook());
+
         MvcResult mvcResult = mockMvc
                 .perform(post("/")
                     .contentType(MediaType.APPLICATION_JSON)
