@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource("/application.properties")
@@ -48,5 +50,16 @@ public class StudentAndGradeServiceTest {
     public void isStudentNullCheck() {
         assertTrue(studentAndGradeService.checkIfStudentIsNull(1));
         assertFalse(studentAndGradeService.checkIfStudentIsNull(0));
+    }
+
+    @Test
+    public void deleteStudentTest() {
+        Optional<CollegeStudent> studentOptional = studentDao.findById(1);
+        assertTrue(studentOptional.isPresent(), "Return True");
+
+        studentAndGradeService.deleteStudent(1);
+
+        Optional<CollegeStudent> deletedStudentOptional = studentDao.findById(1);
+        assertFalse(deletedStudentOptional.isPresent(), "Return False");
     }
 }

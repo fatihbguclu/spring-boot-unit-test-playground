@@ -23,4 +23,8 @@ public class StudentAndGradeService {
         Optional<CollegeStudent> studentOptional = studentDao.findById(id);
         return studentOptional.isPresent();
     }
+
+    public void deleteStudent(int id) {
+        studentDao.deleteById(id);
+    }
 }
