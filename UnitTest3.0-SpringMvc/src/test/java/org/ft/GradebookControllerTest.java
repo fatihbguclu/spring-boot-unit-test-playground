@@ -2,15 +2,19 @@ package org.ft;
 
 import org.ft.model.CollegeStudent;
 import org.ft.model.GradebookCollegeStudent;
+import org.ft.repository.StudentDao;
 import org.ft.service.StudentAndGradeService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.ModelAndViewAssert;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,13 +27,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @TestPropertySource("/application.properties")
 @AutoConfigureMockMvc
 public class GradebookControllerTest {
+
+    private static MockHttpServletRequest request;
 
     @Autowired
     private JdbcTemplate jdbc;
@@ -39,6 +47,17 @@ public class GradebookControllerTest {
 
     @Mock
     private StudentAndGradeService studentCreateServiceMock;
+
+    @Autowired
+    private StudentDao studentDao;
+
+    @BeforeAll
+    public static void setup() {
+        request = new MockHttpServletRequest();
+        request.setParameter("firstname", "Chad");
+        request.setParameter("lastname", "Darby");
+        request.setParameter("emailAddress", "chad.darby@luv2code_school.com");
+    }
 
     @BeforeEach
     public void beforeEach() {
@@ -66,5 +85,22 @@ public class GradebookControllerTest {
 
         ModelAndView modelAndView = mvcResult.getModelAndView();
         ModelAndViewAssert.assertViewName(modelAndView, "index");
+    }
+
+    @Test
+    public void createStudentHttpRequest() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(post("/")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .param("firstname", request.getParameterValues("firstname"))
+                    .param("lastname", request.getParameterValues("lastname"))
+                    .param("emailAddress", request.getParameterValues("emailAddress")))
+                .andExpect(status().isOk())
+                .andReturn();
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+
+        ModelAndViewAssert.assertViewName(modelAndView, "index");
+        CollegeStudent verifyStudent = studentDao.findByEmailAddress("chad.darby@luv2code_school.com");
+        assertNotNull(verifyStudent, "Student should be found");
     }
 }
