@@ -1,6 +1,8 @@
 package org.ft;
 
 import org.ft.model.CollegeStudent;
+import org.ft.model.MathGrade;
+import org.ft.repository.MathGradeDao;
 import org.ft.repository.StudentDao;
 import org.ft.service.StudentAndGradeService;
 import org.junit.jupiter.api.AfterEach;
@@ -27,6 +29,9 @@ public class StudentAndGradeServiceTest {
 
     @Autowired
     private StudentDao studentDao;
+
+    @Autowired
+    private MathGradeDao mathGradeDao;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -73,5 +78,12 @@ public class StudentAndGradeServiceTest {
         List<CollegeStudent> collegeStudents = new ArrayList<>();
         gradeBook.forEach(collegeStudents::add);
         assertEquals(5, collegeStudents.size());
+    }
+
+    @Test
+    public void createGradeService() {
+        assertTrue(studentAndGradeService.createGrade(80.50, 1, "math"));
+        Iterable<MathGrade> mathGrades = mathGradeDao.findMathGradeByStudentId(1);
+        assertTrue(mathGrades.iterator().hasNext(), "Student has math grades");
     }
 }
