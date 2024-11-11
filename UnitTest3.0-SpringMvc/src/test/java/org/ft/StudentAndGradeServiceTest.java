@@ -1,8 +1,12 @@
 package org.ft;
 
 import org.ft.model.CollegeStudent;
+import org.ft.model.HistoryGrade;
 import org.ft.model.MathGrade;
+import org.ft.model.ScienceGrade;
+import org.ft.repository.HistoryGradeDao;
 import org.ft.repository.MathGradeDao;
+import org.ft.repository.ScienceGradeDao;
 import org.ft.repository.StudentDao;
 import org.ft.service.StudentAndGradeService;
 import org.junit.jupiter.api.AfterEach;
@@ -32,6 +36,12 @@ public class StudentAndGradeServiceTest {
 
     @Autowired
     private MathGradeDao mathGradeDao;
+
+    @Autowired
+    private ScienceGradeDao scienceGradeDao;
+
+    @Autowired
+    private HistoryGradeDao historyGradeDao;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -83,7 +93,15 @@ public class StudentAndGradeServiceTest {
     @Test
     public void createGradeService() {
         assertTrue(studentAndGradeService.createGrade(80.50, 1, "math"));
+        assertTrue(studentAndGradeService.createGrade(80.50, 1, "science"));
+        assertTrue(studentAndGradeService.createGrade(80.50, 1, "history"));
+
         Iterable<MathGrade> mathGrades = mathGradeDao.findMathGradeByStudentId(1);
+        Iterable<ScienceGrade> scienceGrades = scienceGradeDao.findScienceGradeByStudentId(1);
+        Iterable<HistoryGrade> historyGrades = historyGradeDao.findHistoryGradeByStudentId(1);
+
         assertTrue(mathGrades.iterator().hasNext(), "Student has math grades");
+        assertTrue(scienceGrades.iterator().hasNext(), "Student has science grades");
+        assertTrue(historyGrades.iterator().hasNext(), "Student has history grades");
     }
 }
