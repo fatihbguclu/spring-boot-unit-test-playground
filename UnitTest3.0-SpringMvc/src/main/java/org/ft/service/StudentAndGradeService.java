@@ -1,9 +1,6 @@
 package org.ft.service;
 
-import org.ft.model.CollegeStudent;
-import org.ft.model.HistoryGrade;
-import org.ft.model.MathGrade;
-import org.ft.model.ScienceGrade;
+import org.ft.model.*;
 import org.ft.repository.HistoryGradeDao;
 import org.ft.repository.MathGradeDao;
 import org.ft.repository.ScienceGradeDao;
@@ -12,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,6 +40,9 @@ public class StudentAndGradeService {
     @Qualifier("historyGrades")
     private HistoryGrade historyGrade;
 
+    @Autowired
+    private StudentGrades studentGrades;
+
     public void createStudent(String firstname, String lastname, String emailAddress) {
         CollegeStudent student = new CollegeStudent(firstname, lastname, emailAddress);
         student.setId(0);
@@ -53,7 +55,12 @@ public class StudentAndGradeService {
     }
 
     public void deleteStudent(int id) {
-        studentDao.deleteById(id);
+        if (checkIfStudentIsNull(id)) {
+            studentDao.deleteById(id);
+            mathGradeDao.deleteByStudentId(id);
+            scienceGradeDao.deleteByStudentId(id);
+            historyGradeDao.deleteByStudentId(id);
+        }
     }
 
     public Iterable<CollegeStudent> getGradeBook() {
@@ -117,5 +124,31 @@ public class StudentAndGradeService {
             historyGradeDao.deleteById(id);
         }
         return studentId;
+    }
+
+    public GradebookCollegeStudent studentInformation(int id) {
+        if (!checkIfStudentIsNull(id)) {
+            return null;
+        }
+        Optional<CollegeStudent> student = studentDao.findById(id);
+        Iterable<MathGrade> mathGrades = mathGradeDao.findMathGradeByStudentId(id);
+        Iterable<ScienceGrade> scienceGrades = scienceGradeDao.findScienceGradeByStudentId(id);
+        Iterable<HistoryGrade> historyGrades = historyGradeDao.findHistoryGradeByStudentId(id);
+
+        List<Grade> mathGradesList = new ArrayList<>();
+        mathGrades.forEach(mathGradesList::add);
+
+        List<Grade> scienceGradesList = new ArrayList<>();
+        scienceGrades.forEach(scienceGradesList::add);
+
+        List<Grade> historyGradesList = new ArrayList<>();
+        historyGrades.forEach(historyGradesList::add);
+
+        studentGrades.setMathGradeResults(mathGradesList);
+        studentGrades.setScienceGradeResults(scienceGradesList);
+        studentGrades.setHistoryGradeResults(historyGradesList);
+
+        return new GradebookCollegeStudent(student.get().getId(), student.get().getFirstname(),
+                student.get().getLastname(), student.get().getEmailAddress(), studentGrades);
     }
 }

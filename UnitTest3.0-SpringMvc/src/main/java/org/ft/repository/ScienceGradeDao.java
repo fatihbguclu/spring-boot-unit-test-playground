@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ScienceGradeDao extends CrudRepository<ScienceGrade, Integer> {
 
-    public Iterable<ScienceGrade> findScienceGradeByStudentId(int id);
+    Iterable<ScienceGrade> findScienceGradeByStudentId(int id);
 
+    void deleteByStudentId(int id);
 }

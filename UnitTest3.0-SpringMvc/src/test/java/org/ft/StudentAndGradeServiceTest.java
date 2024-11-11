@@ -1,9 +1,6 @@
 package org.ft;
 
-import org.ft.model.CollegeStudent;
-import org.ft.model.HistoryGrade;
-import org.ft.model.MathGrade;
-import org.ft.model.ScienceGrade;
+import org.ft.model.*;
 import org.ft.repository.HistoryGradeDao;
 import org.ft.repository.MathGradeDao;
 import org.ft.repository.ScienceGradeDao;
@@ -135,5 +132,24 @@ public class StudentAndGradeServiceTest {
                 "No student should have 0 id");
         assertEquals(0, studentAndGradeService.deleteGrade(1, "literature"),
                 "No student should have a literature class");
+    }
+
+    @Test
+    public void studentInformation() {
+        GradebookCollegeStudent gradebookCollegeStudent = studentAndGradeService.studentInformation(1);
+        assertNotNull(gradebookCollegeStudent);
+        assertEquals(1, gradebookCollegeStudent.getId());
+        assertEquals("Eric", gradebookCollegeStudent.getFirstname());
+        assertEquals("Roby", gradebookCollegeStudent.getLastname());
+        assertEquals("eric.roby@luv2code_school.com", gradebookCollegeStudent.getEmailAddress());
+        assertEquals(1, gradebookCollegeStudent.getStudentGrades().getMathGradeResults().size());
+        assertEquals(1, gradebookCollegeStudent.getStudentGrades().getScienceGradeResults().size());
+        assertEquals(1, gradebookCollegeStudent.getStudentGrades().getHistoryGradeResults().size());
+    }
+
+    @Test
+    public void studentInformationServiceReturnNull() {
+        GradebookCollegeStudent gradebookCollegeStudent = studentAndGradeService.studentInformation(0);
+        assertNull(gradebookCollegeStudent);
     }
 }
