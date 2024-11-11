@@ -19,6 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.List;
 
@@ -105,9 +106,9 @@ public class StudentAndGradeServiceTest {
         Iterable<ScienceGrade> scienceGrades = scienceGradeDao.findScienceGradeByStudentId(1);
         Iterable<HistoryGrade> historyGrades = historyGradeDao.findHistoryGradeByStudentId(1);
 
-        assertTrue(mathGrades.iterator().hasNext(), "Student has math grades");
-        assertTrue(scienceGrades.iterator().hasNext(), "Student has science grades");
-        assertTrue(historyGrades.iterator().hasNext(), "Student has history grades");
+        assertEquals(2, ((Collection<MathGrade>) mathGrades).size(), "Student has math grades");
+        assertEquals(2, ((Collection<ScienceGrade>) scienceGrades).size(), "Student has science grades");
+        assertEquals(2, ((Collection<HistoryGrade>) historyGrades).size(), "Student has history grades");
     }
 
     @Test
@@ -116,5 +117,23 @@ public class StudentAndGradeServiceTest {
         assertFalse(studentAndGradeService.createGrade(-5, 1, "math"));
         assertFalse(studentAndGradeService.createGrade(80.50, 2, "math"));
         assertFalse(studentAndGradeService.createGrade(80.50, 1, "literature"));
+    }
+
+    @Test
+    public void deleteGradeService() {
+        assertEquals(1, studentAndGradeService.deleteGrade(1, "math"),
+                "Returns student id after delete");
+        assertEquals(1, studentAndGradeService.deleteGrade(1, "science"),
+                "Returns student id after delete");
+        assertEquals(1, studentAndGradeService.deleteGrade(1, "history"),
+                "Returns student id after delete");
+    }
+
+    @Test
+    public void deleteGradeServiceReturnStudentIdOfZero() {
+        assertEquals(0, studentAndGradeService.deleteGrade(0, "science"),
+                "No student should have 0 id");
+        assertEquals(0, studentAndGradeService.deleteGrade(1, "literature"),
+                "No student should have a literature class");
     }
 }
