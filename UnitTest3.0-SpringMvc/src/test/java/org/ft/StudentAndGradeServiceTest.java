@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
@@ -44,20 +45,44 @@ public class StudentAndGradeServiceTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Value("${sql.script.create.student}")
+    private String sqlAddStudent;
+
+    @Value("${sql.script.create.math.grade}")
+    private String sqlAddMathGrade;
+
+    @Value("${sql.script.create.science.grade}")
+    private String sqlAddScienceGrade;
+
+    @Value("${sql.script.create.history.grade}")
+    private String sqlAddHistoryGrade;
+
+    @Value("${sql.script.delete.student}")
+    private String sqlDeleteStudent;
+
+    @Value("${sql.script.delete.math.grade}")
+    private String sqlDeleteMathGrade;
+
+    @Value("${sql.script.delete.science.grade}")
+    private String sqlDeleteScienceGrade;
+
+    @Value("${sql.script.delete.history.grade}")
+    private String sqlDeleteHistoryGrade;
+
     @BeforeEach
     public void setupDatabase() {
-        jdbcTemplate.execute("insert into student(id, firstname, lastname, email_address)" + "values (1, 'Eric', 'Roby', 'eric.roby@luv2code_school.com')");
-        jdbcTemplate.execute("insert into math_grade(id,student_id,grade) values (1,1,100.00)");
-        jdbcTemplate.execute("insert into science_grade(id,student_id,grade) values (1,1,100.00)");
-        jdbcTemplate.execute("insert into history_grade(id,student_id,grade) values (1,1,100.00)");
+        jdbcTemplate.execute(sqlAddStudent);
+        jdbcTemplate.execute(sqlAddMathGrade);
+        jdbcTemplate.execute(sqlAddScienceGrade);
+        jdbcTemplate.execute(sqlAddHistoryGrade);
     }
 
     @AfterEach
     public void cleanDatabase() {
-        jdbcTemplate.execute("DELETE FROM student");
-        jdbcTemplate.execute("DELETE FROM math_grade");
-        jdbcTemplate.execute("DELETE FROM science_grade");
-        jdbcTemplate.execute("DELETE FROM history_grade");
+        jdbcTemplate.execute(sqlDeleteStudent);
+        jdbcTemplate.execute(sqlDeleteMathGrade);
+        jdbcTemplate.execute(sqlDeleteScienceGrade);
+        jdbcTemplate.execute(sqlDeleteHistoryGrade);
     }
 
     @Test
@@ -75,13 +100,24 @@ public class StudentAndGradeServiceTest {
 
     @Test
     public void deleteStudentTest() {
-        Optional<CollegeStudent> studentOptional = studentDao.findById(1);
-        assertTrue(studentOptional.isPresent(), "Return True");
+        Optional<CollegeStudent> deletedCollegeStudent = studentDao.findById(1);
+        Optional<MathGrade> deletedMathGrade = mathGradeDao.findById(1);
+        Optional<HistoryGrade> deletedHistoryGrade = historyGradeDao.findById(1);
+        Optional<ScienceGrade> deletedScienceGrade = scienceGradeDao.findById(1);
+
+        assertTrue(deletedCollegeStudent.isPresent(), "Return True");
 
         studentAndGradeService.deleteStudent(1);
 
-        Optional<CollegeStudent> deletedStudentOptional = studentDao.findById(1);
-        assertFalse(deletedStudentOptional.isPresent(), "Return False");
+        deletedCollegeStudent = studentDao.findById(1);
+        deletedMathGrade = mathGradeDao.findById(1);
+        deletedScienceGrade = scienceGradeDao.findById(1);
+        deletedHistoryGrade = historyGradeDao.findById(1);
+
+        assertFalse(deletedCollegeStudent.isPresent(), "Return False");
+        assertFalse(deletedMathGrade.isPresent());
+        assertFalse(deletedScienceGrade.isPresent());
+        assertFalse(deletedHistoryGrade.isPresent());
     }
 
     @Sql("/insertData.sql")
