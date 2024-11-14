@@ -206,16 +206,37 @@ public class GradebookControllerTest {
                         .param("grade", "85.00")
                         .param("gradeType", "math")
                         .param("studentId", "1")
-                )
-                .andExpect(status().isOk())
+                ).andExpect(status().isOk())
                 .andReturn();
-
-        ModelAndView mav = mvcResult.getModelAndView();
-
-        ModelAndViewAssert.assertViewName(mav, "studentInformation");
-
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        ModelAndViewAssert.assertViewName(modelAndView, "studentInformation");
         student = studentAndGradeService.studentInformation(1);
-
         assertEquals(2, student.getStudentGrades().getMathGradeResults().size());
+    }
+
+    @Test
+    public void createAValidGradeHttpRequestStudentDoesNotExistEmptyResponse() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(post("/grades")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("grade", "85.00")
+                        .param("gradeType", "history")
+                        .param("studentId", "0")
+                ).andExpect(status().isOk()).andReturn();
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        ModelAndViewAssert.assertViewName(modelAndView, "error");
+    }
+
+    @Test
+    public void createANonValidGradeHttpRequestGradeTypeDoesNotExistEmptyResponse() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(post("/grades")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("grade", "85.00")
+                        .param("gradeType", "literature")
+                        .param("studentId", "1")
+                ).andExpect(status().isOk()).andReturn();
+        ModelAndView modelAndView = mvcResult.getModelAndView();
+        ModelAndViewAssert.assertViewName(modelAndView, "error");
     }
 }
