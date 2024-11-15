@@ -63,4 +63,14 @@ public class GradebookController {
         studentAndGradeService.configureStudentInformationModel(studentId, m);
         return "studentInformation";
     }
+
+    @GetMapping("/grades/{id}/{gradeType}")
+    public String studentInformation(@PathVariable int id, @PathVariable String gradeType, Model m) {
+        int studentId = studentAndGradeService.deleteGrade(id, gradeType);
+        if (studentId == 0) {
+            return "error";
+        }
+        studentAndGradeService.configureStudentInformationModel(studentId, m);
+        return "studentInformation";
+    }
 }
