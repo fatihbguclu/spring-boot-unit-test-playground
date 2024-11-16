@@ -1,0 +1,112 @@
+package org.ft;
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ft.repository.HistoryGradeDao;
+import org.ft.repository.MathGradeDao;
+import org.ft.repository.ScienceGradeDao;
+import org.ft.repository.StudentDao;
+import org.ft.service.StudentAndGradeService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+
+@SpringBootTest
+@TestPropertySource("/application-test.properties")
+@AutoConfigureMockMvc
+@Transactional
+public class GradeBookControllerTest {
+
+    private static MockHttpServletRequest request;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Mock
+    StudentAndGradeService studentAndGradeServiceMock;
+
+    @Autowired
+    private JdbcTemplate jdbc;
+
+    @Autowired
+    private StudentDao studentDao;
+
+    @Autowired
+    private MathGradeDao mathGradeDao;
+
+    @Autowired
+    private ScienceGradeDao scienceGradeDao;
+
+    @Autowired
+    private HistoryGradeDao historyGradeDao;
+
+    @Autowired
+    private StudentAndGradeService studentService;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Value("${sql.script.create.student}")
+    private String sqlAddStudent;
+
+    @Value("${sql.script.create.math.grade}")
+    private String sqlAddMathGrade;
+
+    @Value("${sql.script.create.science.grade}")
+    private String sqlAddScienceGrade;
+
+    @Value("${sql.script.create.history.grade}")
+    private String sqlAddHistoryGrade;
+
+    @Value("${sql.script.delete.student}")
+    private String sqlDeleteStudent;
+
+    @Value("${sql.script.delete.math.grade}")
+    private String sqlDeleteMathGrade;
+
+    @Value("${sql.script.delete.science.grade}")
+    private String sqlDeleteScienceGrade;
+
+    @Value("${sql.script.delete.history.grade}")
+    private String sqlDeleteHistoryGrade;
+
+    @BeforeAll
+    public static void setup() {
+        request = new MockHttpServletRequest();
+        request.setParameter("firstname", "Chad");
+        request.setParameter("lastname", "Darby");
+        request.setParameter("emailAddress", "chad.darby@luv2code_school.com");
+    }
+
+    @BeforeEach
+    public void setupDatabase() {
+        jdbc.execute(sqlAddStudent);
+        jdbc.execute(sqlAddMathGrade);
+        jdbc.execute(sqlAddScienceGrade);
+        jdbc.execute(sqlAddHistoryGrade);
+    }
+
+    @AfterEach
+    public void setupAfterTransaction() {
+        jdbc.execute(sqlDeleteStudent);
+        jdbc.execute(sqlDeleteMathGrade);
+        jdbc.execute(sqlDeleteScienceGrade);
+        jdbc.execute(sqlDeleteHistoryGrade);
+    }
+}
