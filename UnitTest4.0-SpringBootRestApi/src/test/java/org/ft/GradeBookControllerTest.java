@@ -3,6 +3,7 @@ package org.ft;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ft.model.CollegeStudent;
+import org.ft.model.MathGrade;
 import org.ft.repository.HistoryGradeDao;
 import org.ft.repository.MathGradeDao;
 import org.ft.repository.ScienceGradeDao;
@@ -217,6 +218,40 @@ public class GradeBookControllerTest {
                         .param("grade", "85.00")
                         .param("gradeType", "math")
                         .param("studentId", "0"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.status", is(404)))
+                .andExpect(jsonPath("$.message", is("Student or Grade was not found")));
+    }
+
+    @Test
+    public void createANonValidGradeHttpRequestGradeTypeDoesNotExistEmptyResponse() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/grades")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("grade", "85.00")
+                        .param("gradeType", "literature")
+                        .param("studentId", "1"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.status", is(404)))
+                .andExpect(jsonPath("$.message", is("Student or Grade was not found")));
+    }
+
+    @Test
+    public void deleteAValidGradeHttpRequest() throws Exception {
+        Optional<MathGrade> mathGrade = mathGradeDao.findById(1);
+        assertTrue(mathGrade.isPresent());
+        mockMvc.perform(MockMvcRequestBuilders.delete("/grades/{id}/{gradeType}", 1 , "math"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.firstname", is("Eric")))
+                .andExpect(jsonPath("$.lastname", is("Roby")))
+                .andExpect(jsonPath("$.emailAddress", is("eric.roby@luv2code_school.com")))
+                .andExpect(jsonPath("$.studentGrades.mathGradeResults", hasSize(0)));
+    }
+
+    @Test
+    public void deleteANonValidGradeHttpRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/grades/{id}/{gradeType}", 1 , "literature"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.status", is(404)))
                 .andExpect(jsonPath("$.message", is("Student or Grade was not found")));
