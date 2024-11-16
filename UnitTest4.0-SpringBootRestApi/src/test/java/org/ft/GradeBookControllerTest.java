@@ -2,6 +2,7 @@ package org.ft;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ft.model.CollegeStudent;
 import org.ft.repository.HistoryGradeDao;
 import org.ft.repository.MathGradeDao;
 import org.ft.repository.ScienceGradeDao;
@@ -10,19 +11,28 @@ import org.ft.service.StudentAndGradeService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @TestPropertySource("/application-test.properties")
@@ -57,6 +67,9 @@ public class GradeBookControllerTest {
     private StudentAndGradeService studentService;
 
     @Autowired
+    private CollegeStudent collegeStudent;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -86,6 +99,8 @@ public class GradeBookControllerTest {
     @Value("${sql.script.delete.history.grade}")
     private String sqlDeleteHistoryGrade;
 
+    public static final MediaType APPLICATION_JSON_UTF8 = MediaType.APPLICATION_JSON;
+
     @BeforeAll
     public static void setup() {
         request = new MockHttpServletRequest();
@@ -108,5 +123,42 @@ public class GradeBookControllerTest {
         jdbc.execute(sqlDeleteMathGrade);
         jdbc.execute(sqlDeleteScienceGrade);
         jdbc.execute(sqlDeleteHistoryGrade);
+    }
+
+    @Test
+    public void getStudentsHttpRequest() throws Exception {
+        collegeStudent.setFirstname("Chad");
+        collegeStudent.setLastname("Darby");
+        collegeStudent.setEmailAddress("chad.darby@luv2code_school.com");
+        entityManager.persist(collegeStudent);
+        entityManager.flush();
+        mockMvc.perform(MockMvcRequestBuilders.get("/"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    public void createStudentHttpRequest() throws Exception {
+        collegeStudent.setFirstname("Chad");
+        collegeStudent.setLastname("Darby");
+        collegeStudent.setEmailAddress("chad_darby@luv2code_school.com");
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(collegeStudent))
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)));
+        CollegeStudent verifyStudent = studentDao.findByEmailAddress("chad_darby@luv2code_school.com");
+        assertNotNull(verifyStudent, "Student should be valid.");
+    }
+
+    @Test
+    public void deleteStudentHttpRequest() throws Exception {
+        assertTrue(studentDao.findById(1).isPresent());
+        mockMvc.perform(MockMvcRequestBuilders.delete("/student/{id}", 1))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)));
+        assertFalse(studentDao.findById(1).isPresent());
     }
 }
