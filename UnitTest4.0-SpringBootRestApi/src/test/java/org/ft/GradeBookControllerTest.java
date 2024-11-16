@@ -1,19 +1,14 @@
 package org.ft;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ft.model.CollegeStudent;
 import org.ft.model.MathGrade;
-import org.ft.repository.HistoryGradeDao;
 import org.ft.repository.MathGradeDao;
-import org.ft.repository.ScienceGradeDao;
 import org.ft.repository.StudentDao;
-import org.ft.service.StudentAndGradeService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -48,9 +43,6 @@ public class GradeBookControllerTest {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Mock
-    StudentAndGradeService studentAndGradeServiceMock;
-
     @Autowired
     private JdbcTemplate jdbc;
 
@@ -59,15 +51,6 @@ public class GradeBookControllerTest {
 
     @Autowired
     private MathGradeDao mathGradeDao;
-
-    @Autowired
-    private ScienceGradeDao scienceGradeDao;
-
-    @Autowired
-    private HistoryGradeDao historyGradeDao;
-
-    @Autowired
-    private StudentAndGradeService studentService;
 
     @Autowired
     private CollegeStudent collegeStudent;
